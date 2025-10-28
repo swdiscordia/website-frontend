@@ -288,7 +288,9 @@ export default function BlogPost(): ReactNode {
 					<IconBack />
 					<span>{'Back'}</span>
 				</button>
-				<div className={'mb-8 text-gray-400'}>{new Date(post.publishedAt).toLocaleDateString()}</div>
+				<div className={'no-translate mb-8 text-gray-400'}>
+					{new Date(post.publishedAt).toLocaleDateString()}
+				</div>
 
 				<div className={'mb-8 flex flex-wrap gap-2'}>
 					{post.tags.map((tag: string, index: number) => (
