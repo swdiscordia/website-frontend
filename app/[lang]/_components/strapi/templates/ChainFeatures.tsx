@@ -136,7 +136,7 @@ function BuyInSecondsFeature({chainName}: {chainName: string}): ReactNode {
 							variant={'white'}
 							className={'!w-[120px]'}
 							title={'Buy'}
-							href={'https://app.shapeshift.com/#/buy-crypto'}
+							href={'https://app.shapeshift.com/#/ramp/trade/buy'}
 						/>
 					</div>
 				</div>
@@ -145,7 +145,7 @@ function BuyInSecondsFeature({chainName}: {chainName: string}): ReactNode {
 					<LocalizedLink
 						className={'text-white underline'}
 						target={'_blank'}
-						href={'https://app.shapeshift.com/#/buy-crypto'}>
+						href={'https://app.shapeshift.com/#/ramp/trade/buy'}>
 						{'fiat ramp'}
 					</LocalizedLink>
 					{`. No matter where you are, ShapeShift makes it effortless buy ${chainName}.`}
@@ -361,7 +361,7 @@ function StreamingSwapsFeature({chainName}: {chainName: string}): ReactNode {
 					<LocalizedLink
 						className={'text-white underline'}
 						target={'_blank'}
-						href={'https://app.shapeshift.com/#/buy-crypto'}>
+						href={'https://app.shapeshift.com/#/ramp/trade/buy'}>
 						{'fiat ramp'}
 					</LocalizedLink>
 					{`. No matter where you are, ShapeShift makes it effortless buy ${chainName}.`}
