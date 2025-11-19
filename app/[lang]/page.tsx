@@ -5,6 +5,7 @@ import {useState} from 'react'
 
 import {Banner} from '@/app/[lang]/_components/Banner'
 import {LatestBlogPosts} from '@/app/[lang]/_components/BlogList'
+import {Button} from '@/app/[lang]/_components/Button'
 import {Carousel} from '@/app/[lang]/_components/Carousel'
 import {LandingCard} from '@/app/[lang]/_components/LandingCard'
 import {LandingInfoCard} from '@/app/[lang]/_components/LandingInfoCard'
@@ -32,12 +33,17 @@ import {
 	statCardsTitle
 } from '@/app/[lang]/_utils/constants'
 
+import {useIsMobile} from './_hooks/useIsMobile'
+
 import type {TCard} from '@/app/[lang]/_components/strapi/types'
 import type {ReactNode} from 'react'
 
 export default function HomePage(): ReactNode {
 	const [tab, setTab] = useState(homepageFeatureTabs[0])
-
+	const isMobile = useIsMobile()
+	const createWalletHref = isMobile
+		? '/mobile-app'
+		: 'https://app.shapeshift.com/?utm_source=mainpage&utm_medium=hero&utm_campaign=create#/wallet'
 	return (
 		<div className={'flex min-h-screen flex-col items-center pt-4'}>
 			<div className={'relative flex h-[814px] w-full justify-center rounded-2xl p-6'}>
@@ -53,7 +59,7 @@ export default function HomePage(): ReactNode {
 
 				<div
 					className={
-						'container z-20 flex w-full flex-col items-center justify-between pb-20 pt-6 lg:flex-row'
+						'container z-20 flex w-full flex-col items-center justify-between pb-10 pt-6 lg:flex-row lg:items-end'
 					}>
 					<div className={'flex h-full max-w-[800px] flex-col justify-end'}>
 						<div className={'flex flex-col gap-6'}>
@@ -64,9 +70,25 @@ export default function HomePage(): ReactNode {
 								{heroTitle}
 							</h1>
 
-							<p className={'mb-[60px] text-center text-sm text-white lg:text-left lg:text-xl'}>
-								{heroDescription}
-							</p>
+							<div className={'flex flex-col items-center lg:items-start'}>
+								<p className={'text-center text-sm text-white lg:text-left lg:text-xl'}>
+									{heroDescription}
+								</p>
+								<div className={'flex gap-4 mt-4 mb-4 text-center justify-center lg:justify-start'}>
+									{/* On mobile we direct users to the mobile app if they need a wallet, otherwise web app */}
+									<LocalizedLink
+										href={createWalletHref}
+										target={isMobile ? undefined : '_blank'}>
+										<Button title={'Create a Wallet'} />
+									</LocalizedLink>
+									<Button
+										title={'Trade Now'}
+										href={
+											'https://app.shapeshift.com/?utm_source=mainpage&utm_medium=hero&utm_campaign=trade#/trade'
+										}
+									/>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div>
