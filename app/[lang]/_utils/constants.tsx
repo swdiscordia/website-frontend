@@ -946,7 +946,7 @@ export const landingInfoCards = [
   },
   {
     title: 'Available chains',
-    stat: '15+',
+    stat: '48+',
   },
   {
     title: 'Assets',
