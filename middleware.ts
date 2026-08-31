@@ -36,6 +36,17 @@ function hasLocaleInPath(pathname: string): boolean {
 }
 
 /**
+ * Check if pathname is the developers page (with or without a locale prefix)
+ */
+function isDevelopersPath(pathname: string): boolean {
+  const withoutLocale = SUPPORTED_LANGUAGES.reduce(
+    (path, lang) => (path.startsWith(`/${lang.code}/`) ? path.slice(lang.code.length + 1) : path),
+    pathname
+  )
+  return withoutLocale === '/developers' || withoutLocale.startsWith('/developers/')
+}
+
+/**
  * Create headers with locale information
  */
 function createLocaleHeaders(requestHeaders: Headers, pathname: string, locale: string): Headers {
@@ -159,7 +170,19 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   // Set the CSP header with the nonce
-  const cspHeader = `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com https://cdn.weglot.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.weglot.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' https:; connect-src 'self' https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com ${strapiHostname} https://cdn.weglot.com https://api.weglot.com https://cdn-api-weglot.com wss://app.chatwoot.com  https://api.thorchain.shapeshift.com; frame-src 'self' https://widget.chatwoot.com https://app.chatwoot.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://app.chatwoot.com; frame-ancestors 'self'; upgrade-insecure-requests;`
+  // The /developers page embeds the real @shapeshiftoss/swap-widget SDK (Reown AppKit, CoinGecko
+  // prices, Coinbase's wagmi connector) — these origins are only needed there, so they're kept out
+  // of every other route's policy rather than widened globally.
+  const developersFontSrc = isDevelopersPath(pathname) ? ' https://fonts.reown.com' : ''
+  const developersConnectSrc = isDevelopersPath(pathname)
+    ? ' https://app.shapeshift.com https://api.proxy.shapeshift.com https://api.coingecko.com https://api.web3modal.org https://cca-lite.coinbase.com'
+    : ''
+  // Coinbase Wallet SDK / Base Account SDK (pulled in transitively by the swap widget's wagmi
+  // connectors) inject their own inline bootstrap <script> tags, which our own nonce doesn't cover.
+  // 'strict-dynamic' lets scripts loaded by an already-nonce-trusted script (the widget bundle
+  // itself) delegate that trust onward, without weakening script-src for any other route.
+  const developersScriptSrc = isDevelopersPath(pathname) ? " 'strict-dynamic'" : ''
+  const cspHeader = `default-src 'self'; script-src 'self' 'nonce-${nonce}'${developersScriptSrc} https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com https://cdn.weglot.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.weglot.com; font-src 'self' https://fonts.gstatic.com${developersFontSrc}; img-src 'self' data: https: blob:; media-src 'self' https:; connect-src 'self' https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com ${strapiHostname} https://cdn.weglot.com https://api.weglot.com https://cdn-api-weglot.com wss://app.chatwoot.com  https://api.thorchain.shapeshift.com${developersConnectSrc}; frame-src 'self' https://widget.chatwoot.com https://app.chatwoot.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://app.chatwoot.com; frame-ancestors 'self'; upgrade-insecure-requests;`
   response.headers.set('Content-Security-Policy', cspHeader)
 
   // Handle locale routing
