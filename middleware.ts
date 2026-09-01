@@ -175,7 +175,7 @@ export function middleware(request: NextRequest): NextResponse {
   // of every other route's policy rather than widened globally.
   const developersFontSrc = isDevelopersPath(pathname) ? ' https://fonts.reown.com' : ''
   const developersConnectSrc = isDevelopersPath(pathname)
-    ? ' https://app.shapeshift.com https://api.proxy.shapeshift.com https://api.coingecko.com https://api.web3modal.org https://cca-lite.coinbase.com'
+    ? ' https://api.shapeshift.com https://app.shapeshift.com https://api.proxy.shapeshift.com https://api.coingecko.com https://api.web3modal.org https://cca-lite.coinbase.com'
     : ''
   // Coinbase Wallet SDK / Base Account SDK (pulled in transitively by the swap widget's wagmi
   // connectors) inject their own inline bootstrap <script> tags, which our own nonce doesn't cover.
