@@ -170,13 +170,16 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   // Set the CSP header with the nonce
-  // The /developers page embeds the real @shapeshiftoss/swap-widget SDK (Reown AppKit, CoinGecko
-  // prices, Coinbase's wagmi connector) — these origins are only needed there, so they're kept out
-  // of every other route's policy rather than widened globally.
+  // The /developers page embeds the real @shapeshiftoss/swap-widget SDK, following the SDK's own
+  // documented integration (install, import the stylesheet, render <SwapWidget ... />) verbatim --
+  // that guide never mentions a CSP because it doesn't assume the host page restricts connect-src
+  // at all, which is true for most sites embedding it. This one does, so rather than hand-maintain
+  // an exact hostname allowlist (it supports 13+ EVM chains plus Bitcoin/Solana/WalletConnect
+  // infrastructure today, each with its own RPC/relay domain, and silently breaks again on this
+  // page specifically whenever the SDK adds one more), connect-src is opened up to any HTTPS/WSS
+  // destination on /developers only -- every other route keeps the exact, restrictive default.
   const developersFontSrc = isDevelopersPath(pathname) ? ' https://fonts.reown.com' : ''
-  const developersConnectSrc = isDevelopersPath(pathname)
-    ? ' https://api.shapeshift.com https://app.shapeshift.com https://api.proxy.shapeshift.com https://api.coingecko.com https://api.web3modal.org https://cca-lite.coinbase.com'
-    : ''
+  const developersConnectSrc = isDevelopersPath(pathname) ? ' https: wss:' : ''
   // Coinbase Wallet SDK / Base Account SDK (pulled in transitively by the swap widget's wagmi
   // connectors) inject their own inline bootstrap <script> tags, which our own nonce doesn't cover.
   // 'strict-dynamic' lets scripts loaded by an already-nonce-trusted script (the widget bundle
