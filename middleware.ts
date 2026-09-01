@@ -123,7 +123,9 @@ export function middleware(request: NextRequest): NextResponse {
   const pathname = request.nextUrl.pathname
   const hostname = request.headers.get('host') || ''
 
-  // Generate a nonce for CSP
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  // Production uses a per-request nonce. Development needs eval/inline scripts for the Next.js
+  // runtime; omitting the nonce there also avoids a browser-normalized nonce hydration mismatch.
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
 
   // Check for language subdomain
@@ -160,7 +162,7 @@ export function middleware(request: NextRequest): NextResponse {
 
   // Create response with locale headers and nonce
   const headers = createLocaleHeaders(request.headers, pathname, locale)
-  headers.set('x-nonce', nonce)
+  if (!isDevelopment) headers.set('x-nonce', nonce)
   const response = NextResponse.next({ headers })
 
   // Only set locale cookie if user explicitly changed language (cookie already exists)
@@ -170,6 +172,9 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   // Set the CSP header with the nonce
+  const scriptPolicy = isDevelopment
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com https://cdn.weglot.com"
+    : `script-src 'self' 'nonce-${nonce}' https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com https://cdn.weglot.com`
   // The /developers page embeds the real @shapeshiftoss/swap-widget SDK. These four origins are
   // what asset/chain selection and real quotes actually need: api.shapeshift.com (rates),
   // app.shapeshift.com (the token/chain list), and api.coingecko.com / api.proxy.shapeshift.com
@@ -185,9 +190,12 @@ export function middleware(request: NextRequest): NextResponse {
   // Coinbase Wallet SDK / Base Account SDK (pulled in transitively by the swap widget's wagmi
   // connectors) inject their own inline bootstrap <script> tags, which our own nonce doesn't cover.
   // 'strict-dynamic' lets scripts loaded by an already-nonce-trusted script (the widget bundle
-  // itself) delegate that trust onward, without weakening script-src for any other route.
-  const developersScriptSrc = isDevelopersPath(pathname) ? " 'strict-dynamic'" : ''
-  const cspHeader = `default-src 'self'; script-src 'self' 'nonce-${nonce}'${developersScriptSrc} https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com https://cdn.weglot.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.weglot.com; font-src 'self' https://fonts.gstatic.com${developersFontSrc}; img-src 'self' data: https: blob:; media-src 'self' https:; connect-src 'self' https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com ${strapiHostname} https://cdn.weglot.com https://api.weglot.com https://cdn-api-weglot.com wss://app.chatwoot.com  https://api.thorchain.shapeshift.com${developersConnectSrc}; frame-src 'self' https://widget.chatwoot.com https://app.chatwoot.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://app.chatwoot.com; frame-ancestors 'self'; upgrade-insecure-requests;`
+  // itself) delegate that trust onward, without weakening script-src for any other route. Only
+  // meaningful paired with a nonce (dev mode's script-src has none) -- per the CSP spec,
+  // 'strict-dynamic' with no nonce/hash present disables ALL host-based allowlisting and
+  // 'unsafe-inline', blocking every script on the page, not just the ones it's meant to loosen.
+  const developersScriptSrc = isDevelopersPath(pathname) && !isDevelopment ? " 'strict-dynamic'" : ''
+  const cspHeader = `default-src 'self'; ${scriptPolicy}${developersScriptSrc}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.weglot.com; font-src 'self' https://fonts.gstatic.com${developersFontSrc}; img-src 'self' data: https: blob:; media-src 'self' https:; connect-src 'self' https://api.hypelab.com https://app.chatwoot.com https://widget.chatwoot.com ${strapiHostname} https://cdn.weglot.com https://api.weglot.com https://cdn-api-weglot.com wss://app.chatwoot.com  https://api.thorchain.shapeshift.com${developersConnectSrc}; frame-src 'self' https://widget.chatwoot.com https://app.chatwoot.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://app.chatwoot.com; frame-ancestors 'self'; upgrade-insecure-requests;`
   response.headers.set('Content-Security-Policy', cspHeader)
 
   // Handle locale routing
