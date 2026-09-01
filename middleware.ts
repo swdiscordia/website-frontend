@@ -170,16 +170,18 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   // Set the CSP header with the nonce
-  // The /developers page embeds the real @shapeshiftoss/swap-widget SDK, following the SDK's own
-  // documented integration (install, import the stylesheet, render <SwapWidget ... />) verbatim --
-  // that guide never mentions a CSP because it doesn't assume the host page restricts connect-src
-  // at all, which is true for most sites embedding it. This one does, so rather than hand-maintain
-  // an exact hostname allowlist (it supports 13+ EVM chains plus Bitcoin/Solana/WalletConnect
-  // infrastructure today, each with its own RPC/relay domain, and silently breaks again on this
-  // page specifically whenever the SDK adds one more), connect-src is opened up to any HTTPS/WSS
-  // destination on /developers only -- every other route keeps the exact, restrictive default.
+  // The /developers page embeds the real @shapeshiftoss/swap-widget SDK. These four origins are
+  // what asset/chain selection and real quotes actually need: api.shapeshift.com (rates),
+  // app.shapeshift.com (the token/chain list), and api.coingecko.com / api.proxy.shapeshift.com
+  // (market data for the prices shown next to each asset). That's the whole feature set that's
+  // live and tested today. Real wallet connection isn't functional yet (placeholder
+  // walletConnectProjectId, see DevelopersHero.tsx), so the CSP entries that would only matter once
+  // it is -- WalletConnect's relay, per-chain execution RPCs, etc. -- aren't added speculatively;
+  // add them alongside the real project ID once that's live and testable.
   const developersFontSrc = isDevelopersPath(pathname) ? ' https://fonts.reown.com' : ''
-  const developersConnectSrc = isDevelopersPath(pathname) ? ' https: wss:' : ''
+  const developersConnectSrc = isDevelopersPath(pathname)
+    ? ' https://api.shapeshift.com https://app.shapeshift.com https://api.coingecko.com https://api.proxy.shapeshift.com'
+    : ''
   // Coinbase Wallet SDK / Base Account SDK (pulled in transitively by the swap widget's wagmi
   // connectors) inject their own inline bootstrap <script> tags, which our own nonce doesn't cover.
   // 'strict-dynamic' lets scripts loaded by an already-nonce-trusted script (the widget bundle
