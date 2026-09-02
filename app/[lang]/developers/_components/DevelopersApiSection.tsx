@@ -40,7 +40,7 @@ const codePanels = [
       '  ?sellAssetId=eip155:1/slip44:60\\',
       '  &buyAssetId=bip122:00000000...93/slip44:0\\',
       '  &sellAmountCryptoBaseUnit=1000000000000000000" \\',
-      '  -H "X-API-Key: YOUR_KEY"',
+      '  -H "X-Partner-Code: your-partner-code"',
       '',
       '# response · 200',
       '{',
@@ -60,7 +60,7 @@ const codePanels = [
     label: 'POST /v1/swap/quote',
     lines: [
       '$ curl -X POST "https://api.shapeshift.com/v1/swap/quote" \\',
-      '  -H "X-API-Key: YOUR_KEY" \\',
+      '  -H "X-Partner-Code: your-partner-code" \\',
       '  -H "Content-Type: application/json" \\',
       "  -d '{",
       '    "sellAssetId": "eip155:1/slip44:60",',
@@ -134,9 +134,13 @@ function TypedCodePanel({ activeTab }: { activeTab: number }): ReactNode {
         <button
           type={'button'}
           onClick={() => {
-            void navigator.clipboard.writeText(source)
-            setHasCopied(true)
-            window.setTimeout(() => setHasCopied(false), 1800)
+            navigator.clipboard
+              .writeText(source)
+              .then(() => {
+                setHasCopied(true)
+                window.setTimeout(() => setHasCopied(false), 1800)
+              })
+              .catch(() => undefined)
           }}
           className={'ml-auto font-mono text-[10px] text-gray-500 transition-colors hover:text-white'}
         >

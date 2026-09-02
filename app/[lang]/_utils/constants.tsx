@@ -41,7 +41,7 @@ const docsUrl = 'https://github.com/shapeshift/web'
 
 export const developerDocsUrl = 'https://api.shapeshift.com/docs'
 
-const developerDocsSectionUrl = (section: string): string => `${developerDocsUrl}${section}`
+export const developerDocsSectionUrl = (section: string): string => `${developerDocsUrl}${section}`
 
 const githubUrl = 'https://github.com/shapeshift'
 
@@ -268,7 +268,7 @@ export const appDevelopers: TAppLink[] = [
   },
   {
     name: 'Partners portal',
-    href: 'https://widget.shapeshift.com/',
+    href: 'https://dashboard.affiliate.shapeshift.com/',
     description: 'Get your affiliate code and configure the widget.',
     icon: <IconActivityRings />,
     target: '_blank',

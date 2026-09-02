@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
 
 import { AnimatedPlusMinusIcon } from '@/app/[lang]/_components/QuestionSection'
-import { developerDocsUrl } from '@/app/[lang]/_utils/constants'
+import { developerDocsSectionUrl } from '@/app/[lang]/_utils/constants'
 import { DEVELOPERS_DICT } from '@/app/[lang]/_utils/dictionary/developers'
 
 import type { ReactNode } from 'react'
@@ -74,7 +74,7 @@ export function DevelopersFaq(): ReactNode {
             key={item.question}
             question={item.question}
             answer={
-              item.question === 'Which chains are supported?' ? (
+              item.hasChainsLink ? (
                 <>
                   <p>
                     {
@@ -82,7 +82,7 @@ export function DevelopersFaq(): ReactNode {
                     }
                   </p>
                   <a
-                    href={`${developerDocsUrl}/v1/chains`}
+                    href={developerDocsSectionUrl('#tag/supported-chains')}
                     target={'_blank'}
                     rel={'noopener noreferrer'}
                     className={
