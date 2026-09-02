@@ -9,7 +9,7 @@ import { IconFox } from '@/app/[lang]/_icons/IconFox'
 import { IconSettings } from '@/app/[lang]/_icons/IconSettings'
 import { DEVELOPERS_DICT } from '@/app/[lang]/_utils/dictionary/developers'
 
-import type { KeyboardEvent, PointerEvent, ReactNode } from 'react'
+import type { FocusEvent, KeyboardEvent, PointerEvent, ReactNode } from 'react'
 
 // Real preset names and their real background/card/accent colors, read directly off
 // widget.shapeshift.com's own "Customize Widget" panel (clicked through all seven, recorded
@@ -290,7 +290,8 @@ function LiveThemeSwitcher(): ReactNode {
     applyColors(presets[index])
   }
 
-  function handleFocus(): void {
+  function handleFocus(event: FocusEvent<HTMLDivElement>): void {
+    if (event.target !== event.currentTarget) return
     isHoveringRef.current = true
     const index = indexFromBearing(0, rotation.get())
     setDiscreteIndex(index)

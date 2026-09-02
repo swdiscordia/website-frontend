@@ -44,7 +44,7 @@ function RouterIllustration(): ReactNode {
 
         <div
           className={
-            'relative z-10 rounded-[16px] border border-mint/20 bg-[#12201D] px-4 py-3 sm:flex sm:w-[150px] sm:shrink-0 sm:flex-col sm:justify-center sm:text-right'
+            'relative z-10 rounded-[16px] border border-mint/20 bg-[#12201D] px-4 py-3 sm:flex sm:w-[150px] sm:shrink-0 sm:flex-col sm:justify-center'
           }
         >
           <div className={'text-xs text-mint'}>{'Selected'}</div>
