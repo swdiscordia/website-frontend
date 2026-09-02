@@ -16,7 +16,7 @@ export function DevelopersCta(): ReactNode {
         }
       >
         <Image
-          src={'/cta/moon-bg.png'}
+          src={'/bannerFooterBg.png'}
           alt={''}
           aria-hidden={'true'}
           fill
