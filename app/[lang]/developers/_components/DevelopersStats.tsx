@@ -22,18 +22,6 @@ export function DevelopersStats(): ReactNode {
           </div>
         ))}
       </div>
-      <div className={'border-t border-white/[0.07] py-2.5 text-center text-xs leading-relaxed text-gray-600'}>
-        {'These figures are a snapshot and are not updated automatically. '}
-        <a
-          href={'https://api.shapeshift.com/docs'}
-          target={'_blank'}
-          rel={'noopener noreferrer'}
-          className={'text-gray-400 underline decoration-white/20 underline-offset-4 hover:text-white'}
-        >
-          {'Verify current coverage in the API reference'}
-        </a>
-        {'.'}
-      </div>
     </div>
   )
 }
