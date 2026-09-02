@@ -110,7 +110,16 @@ function handleLocaleRouting(
   if (locale === DEFAULT_LANGUAGE) {
     request.nextUrl.pathname = `/${DEFAULT_LANGUAGE}${pathname}`
     console.log('rewriting to', request.nextUrl.pathname)
-    return NextResponse.rewrite(request.nextUrl)
+    // NextResponse.rewrite() creates a brand-new response, so headers (e.g. the CSP header) and
+    // cookies already set on `response` need to be copied forward explicitly or they're lost.
+    const rewrittenResponse = NextResponse.rewrite(request.nextUrl)
+    response.headers.forEach((value, key) => {
+      rewrittenResponse.headers.set(key, value)
+    })
+    response.cookies.getAll().forEach((cookie) => {
+      rewrittenResponse.cookies.set(cookie)
+    })
+    return rewrittenResponse
   }
 
   // Redirect to include locale in path for non-default languages

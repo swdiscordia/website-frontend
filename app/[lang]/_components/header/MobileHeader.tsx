@@ -118,9 +118,9 @@ export function MobileHeader({
                     <div key={tab.name} className={'overflow-hidden rounded-2xl bg-secondBg'}>
                       {tab.value === 'developers' ? (
                         <div className={'flex w-full items-center text-2xl'}>
-                          <LocalizedLink href={tab.href} onClick={() => setIsMenuOpen(false)} className={'flex-1 p-6'}>
+                          <a href={tab.href} onClick={() => setIsMenuOpen(false)} className={'flex-1 p-6'}>
                             {tab.name}
-                          </LocalizedLink>
+                          </a>
                           <button
                             type={'button'}
                             aria-label={'Toggle Developers links'}

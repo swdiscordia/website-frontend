@@ -87,11 +87,18 @@ export function DesktopHeader({ className, switchLanguageAction, currentLanguage
                   key={tab.name}
                   onMouseEnter={() => setCurrentTab(tab.value)}
                   className={cl(
-                    'cursor-pointer p-4 text-sm font-medium transition-colors',
+                    'text-sm font-medium transition-colors',
+                    tab.value === 'developers' ? '' : 'cursor-pointer p-4',
                     currentTab && currentTab !== tab.value ? 'text-gray-500' : 'text-white'
                   )}
                 >
-                  {tab.value === 'developers' ? <LocalizedLink href={tab.href}>{tab.name}</LocalizedLink> : tab.name}
+                  {tab.value === 'developers' ? (
+                    <a href={tab.href} className={'block h-full w-full cursor-pointer p-4'}>
+                      {tab.name}
+                    </a>
+                  ) : (
+                    tab.name
+                  )}
                 </div>
               ))}
             </nav>
